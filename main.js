@@ -6,8 +6,6 @@ const existingNote = document.querySelector('.existing-note');
 const noteTextarea = document.getElementById('note-textarea');
 const titleInput = document.getElementById('title');
 
-
-
 class NotesApp {
     constructor() {
         this.notesRef = db.collection("notes");
@@ -17,7 +15,7 @@ class NotesApp {
         try {
             const doc = await this.notesRef.doc(title).get();
             if (doc.exists) {
-                return doc.data().text;
+                return doc.data().encryptedText; // Note: Store encrypted text in the database
             } else {
                 return null;
             }
@@ -27,12 +25,10 @@ class NotesApp {
         }
     }
 
-    async addOrUpdateNote(title, text) {
-        const note = { text };
-
+    async addOrUpdateNote(title, encryptedText) { // Update function to store encrypted text
         try {
-            await this.notesRef.doc(title).set(note, { merge: true });
-            console.log('Note Added/Updated for title:', title);
+            await this.notesRef.doc(title).set({ encryptedText }, { merge: true });
+            console.log('Note Added/Updated');
         } catch (error) {
             console.error('Error Adding/Updating Note:', error);
         }
@@ -45,8 +41,17 @@ async function main() {
     const getAndDisplayNote = async () => {
         const title = titleInput.value.trim();
         if (title) {
-            const noteText = await notesApp.getNoteByTitle(title);
-            noteTextarea.value = noteText || '';
+            const encryptedNote = await notesApp.getNoteByTitle(title);
+            if (encryptedNote) {
+                const decryptedText = decryptNote(encryptedNote, title);
+                if (decryptedText !== null) {
+                    noteTextarea.value = decryptedText;
+                } else {
+                    noteTextarea.value = 'Error decrypting note.';
+                }
+            } else {
+                noteTextarea.value = '';
+            }
             noteEditor.style.display = 'block';
         }
     };
@@ -64,7 +69,8 @@ async function main() {
         const text = noteTextarea.value.trim();
 
         if (title && text) {
-            await notesApp.addOrUpdateNote(title, text);
+            const encryptedText = encryptNote(text, title);
+            await notesApp.addOrUpdateNote(title, encryptedText);
             noteEditor.style.display = 'none';
         }
     });
@@ -77,7 +83,8 @@ async function main() {
             const text = noteTextarea.value.trim();
 
             if (title && text) {
-                await notesApp.addOrUpdateNote(title, text);
+                const encryptedText = encryptNote(text, title);
+                await notesApp.addOrUpdateNote(title, encryptedText);
                 noteEditor.style.display = 'none';
             }
         }
@@ -87,5 +94,22 @@ async function main() {
     // You can implement this based on your needs, fetching all notes and displaying them.
 }
 
-main();
+// Encrypt function
+function encryptNote(text, key) {
+    const encrypted = CryptoJS.AES.encrypt(text, key);
+    return encrypted.toString();
+}
 
+// Decrypt function
+function decryptNote(encryptedText, key) {
+    try {
+        const bytes = CryptoJS.AES.decrypt(encryptedText, key);
+        const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+        return decryptedText;
+    } catch (error) {
+        console.error('Error decrypting note:', error);
+        return null;
+    }
+}
+
+main();
