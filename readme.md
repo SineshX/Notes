@@ -4,6 +4,6 @@ Simple online Notes:
 
 todo: 
 - add encryption such that: 
- - Every note is encrypted with AES-256, using the title as the encryption key. Then use SHA-256 hash of the title to index the encrypted note in a database.
+ - Every note is encrypted with AES-256,
 - display the warning :) 
 - limit the note by [size, ip, etc]
