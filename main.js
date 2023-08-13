@@ -69,8 +69,23 @@ async function main() {
         }
     });
 
+    // Save note on 'Ctrl + S'
+    document.addEventListener('keydown', async (event) => {
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault();
+            const title = titleInput.value.trim();
+            const text = noteTextarea.value.trim();
+
+            if (title && text) {
+                await notesApp.addOrUpdateNote(title, text);
+                noteEditor.style.display = 'none';
+            }
+        }
+    });
+
     // Load existing notes
     // You can implement this based on your needs, fetching all notes and displaying them.
 }
 
 main();
+
