@@ -42,12 +42,20 @@ class NotesApp {
 async function main() {
     const notesApp = new NotesApp();
 
-    accessButton.addEventListener('click', async () => {
+    const getAndDisplayNote = async () => {
         const title = titleInput.value.trim();
         if (title) {
             const noteText = await notesApp.getNoteByTitle(title);
             noteTextarea.value = noteText || '';
             noteEditor.style.display = 'block';
+        }
+    };
+
+    accessButton.addEventListener('click', getAndDisplayNote);
+
+    titleInput.addEventListener('keydown', async (event) => {
+        if (event.key === 'Enter') {
+            getAndDisplayNote();
         }
     });
 
