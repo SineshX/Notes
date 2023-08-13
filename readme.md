@@ -1,7 +1,9 @@
+Simple online Notes: 
+- Add a title and accesss the note. 
+- press ctrl + s or save to save the note. 
 
-<link rel="stylesheet" href="styles.css">
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
-
-<script src="firebase-config.js"></script>
-<script src="main.js"></script>
+todo: 
+- add encryption such that: 
+ - Every note is encrypted with AES-256, using the title as the encryption key. Then use SHA-256 hash of the title to index the encrypted note in a database.
+- display the warning :) 
+- limit the note by [size, ip, etc]
